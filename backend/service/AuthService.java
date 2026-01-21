@@ -6,6 +6,7 @@ import backend.enums.Role;
 import backend.repository.UserRepository;
 import backend.util.PasswordHasher;
 
+import java.util.List;
 import java.util.Optional;
 
 public class AuthService {
@@ -48,5 +49,23 @@ public class AuthService {
         userRepository.save(user);
 
         return "Registration successful! Please login.";
+    }
+
+    // 🔥 --- МЕТОДЫ ДЛЯ АДМИНКИ ---
+
+    // 1. Получить список всех пользователей
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // 2. Сменить роль пользователю
+    public void changeUserRole(Long userId, String roleName) {
+        try {
+            // Приводим к верхнему регистру (admin -> ADMIN)
+            Role role = Role.valueOf(roleName.toUpperCase());
+            userRepository.updateRole(userId, role);
+        } catch (IllegalArgumentException e) {
+            System.out.println("❌ Ошибка: Такой роли нет! (Используйте: ADMIN, MANAGER, CUSTOMER)");
+        }
     }
 }

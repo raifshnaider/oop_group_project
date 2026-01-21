@@ -40,7 +40,7 @@ public class CatalogMenu {
             if ("0".equals(input)) {
                 return; // Выход назад
             } else if ("c".equals(input)) {
-                showCart(); // <-- Твоя новая функция
+                showCart();
             } else if ("p".equals(input)) {
                 checkout();
             } else {
@@ -49,7 +49,6 @@ public class CatalogMenu {
         }
     }
 
-    // 1. Функция добавления в корзину
     private void addToCart(String inputId, Scanner scanner) {
         try {
             Long prodId = Long.parseLong(inputId);
@@ -61,7 +60,8 @@ public class CatalogMenu {
             }
 
             System.out.print("Enter quantity: ");
-            int qty = Integer.parseInt(scanner.nextLine());
+            String qtyStr = scanner.nextLine();
+            int qty = Integer.parseInt(qtyStr);
 
             if (qty <= 0) {
                 System.out.println("❌ Quantity must be positive.");
@@ -77,7 +77,6 @@ public class CatalogMenu {
         }
     }
 
-    // 2. Функция просмотра корзины (ТО, ЧТО ТЫ ПРОСИЛ)
     private void showCart() {
         if (cart.isEmpty()) {
             System.out.println("\n🛒 Cart is empty.");
@@ -91,7 +90,6 @@ public class CatalogMenu {
             Long prodId = entry.getKey();
             Integer qty = entry.getValue();
 
-            // Ищем товар, чтобы узнать его имя и цену
             Optional<Product> pOpt = catalogService.findById(prodId);
             if (pOpt.isPresent()) {
                 Product p = pOpt.get();
@@ -105,25 +103,46 @@ public class CatalogMenu {
         System.out.printf("Total: $%.2f\n", estimatedTotal);
     }
 
-    // Вспомогательная: размер корзины
     private int getCartSize() {
         return cart.values().stream().mapToInt(Integer::intValue).sum();
     }
 
-    // 3. Функция оформления заказа
+    // --- ВОТ ЭТОТ МЕТОД ОБНОВЛЕН ---
     private void checkout() {
         if (cart.isEmpty()) {
-            System.out.println("Cart is empty!");
+            System.out.println("⚠️ Cart is empty! Add items first.");
             return;
         }
 
+        System.out.println("\n💳 Processing payment...");
+
         try {
-            FullOrderDTO result = orderService.placeOrder(cart);
-            System.out.println("🎉 ORDER PLACED SUCCESSFULLY!");
-            System.out.println(result);
-            cart.clear(); // Очищаем корзину после покупки
+            // Оформляем заказ
+            FullOrderDTO receipt = orderService.placeOrder(cart);
+
+            // Выводим красивый чек
+            System.out.println("\n*********************************");
+            System.out.println("          PAYMENT RECEIPT        ");
+            System.out.println("*********************************");
+            System.out.println("Order ID: " + receipt.orderId);
+            System.out.println("Customer: " + receipt.buyerEmail);
+            System.out.println("Status:   " + receipt.status);
+            System.out.println("---------------------------------");
+
+            for (FullOrderDTO.OrderItemInfo item : receipt.items) {
+                BigDecimal lineSum = item.price.multiply(BigDecimal.valueOf(item.quantity));
+                System.out.printf("%-15s x%d = $%.2f\n", item.productName, item.quantity, lineSum);
+            }
+
+            System.out.println("---------------------------------");
+            System.out.printf("TOTAL PAID:           $%.2f\n", receipt.totalAmount);
+            System.out.println("*********************************\n");
+            System.out.println("✅ Thank you for your purchase!");
+
+            cart.clear(); // Очищаем корзину
+
         } catch (Exception e) {
-            System.out.println("❌ Error placing order: " + e.getMessage());
+            System.out.println("❌ Transaction Failed: " + e.getMessage());
         }
     }
 }
