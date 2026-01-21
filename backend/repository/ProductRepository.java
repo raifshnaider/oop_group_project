@@ -3,7 +3,7 @@ package backend.repository;
 import backend.config.DatabaseConfig;
 import backend.entity.Product;
 
-import java.math.BigDecimal; // <-- Не забудь этот импорт!
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,21 +61,15 @@ public class ProductRepository {
         String sql = "UPDATE products SET stock_qty = ? WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, newStock);
             stmt.setLong(2, id);
             stmt.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    // --- НОВЫЕ МЕТОДЫ ДЛЯ МЕНЕДЖЕРА ---
-
-    // 1. Создать товар
     public void save(Product product) {
-        // Учти, что колонка называется stock_qty!
         String sql = "INSERT INTO products (name, price, stock_qty, category_id) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -91,7 +85,6 @@ public class ProductRepository {
         }
     }
 
-    // 2. Обновить цену
     public void updatePrice(Long id, BigDecimal newPrice) {
         String sql = "UPDATE products SET price = ? WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -100,5 +93,17 @@ public class ProductRepository {
             stmt.setLong(2, id);
             stmt.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    // 🔥 НОВЫЙ МЕТОД: УДАЛЕНИЕ
+    public void delete(Long id) {
+        String sql = "DELETE FROM products WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

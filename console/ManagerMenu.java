@@ -11,11 +11,12 @@ public class ManagerMenu {
 
     public void show(Scanner scanner) {
         while (true) {
-            System.out.println("\n=== 📦 MANAGER PANEL (PRODUCT MANAGEMENT) ===");
+            System.out.println("\n=== 📦 MANAGER PANEL ===");
             System.out.println("1. View All Products");
             System.out.println("2. Add New Product");
             System.out.println("3. Update Price");
-            System.out.println("4. Update Stock");
+            System.out.println("4. Add Stock");
+            System.out.println("5. Delete Product"); // 🔥 Новая кнопка
             System.out.println("0. Back");
             System.out.print("> ");
 
@@ -23,12 +24,18 @@ public class ManagerMenu {
 
             if ("0".equals(choice)) return;
 
-            switch (choice) {
-                case "1" -> viewProducts();
-                case "2" -> addProduct(scanner);
-                case "3" -> updatePrice(scanner);
-                case "4" -> updateStock(scanner);
-                default -> System.out.println("Invalid option");
+            try {
+                switch (choice) {
+                    case "1" -> viewProducts();
+                    case "2" -> addProduct(scanner);
+                    case "3" -> updatePrice(scanner);
+                    case "4" -> updateStock(scanner);
+                    case "5" -> deleteProduct(scanner); // 🔥 Вызов метода
+                    default -> System.out.println("Invalid option");
+                }
+            } catch (Exception e) {
+                // Здесь мы ловим ошибки из CatalogService (цена < 0, ID не найден и т.д.)
+                System.out.println("❌ ERROR: " + e.getMessage());
             }
         }
     }
@@ -45,48 +52,55 @@ public class ManagerMenu {
     }
 
     private void addProduct(Scanner scanner) {
-        try {
-            System.out.print("Product Name: ");
-            String name = scanner.nextLine();
-            System.out.print("Price: ");
-            BigDecimal price = new BigDecimal(scanner.nextLine());
-            System.out.print("Stock: ");
-            int stock = Integer.parseInt(scanner.nextLine());
-            System.out.print("Category ID: ");
-            Long catId = Long.parseLong(scanner.nextLine());
+        System.out.print("Product Name: ");
+        String name = scanner.nextLine();
 
-            catalogService.addNewProduct(name, price, stock, catId);
-            System.out.println("✅ Product added successfully!");
-        } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-        }
+        System.out.print("Price: ");
+        BigDecimal price = new BigDecimal(scanner.nextLine());
+
+        System.out.print("Stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Category ID: ");
+        Long catId = Long.parseLong(scanner.nextLine());
+
+        catalogService.addNewProduct(name, price, stock, catId);
+        System.out.println("✅ Product added successfully!");
     }
 
     private void updatePrice(Scanner scanner) {
-        try {
-            System.out.print("Product ID: ");
-            Long id = Long.parseLong(scanner.nextLine());
-            System.out.print("New Price: ");
-            BigDecimal price = new BigDecimal(scanner.nextLine());
+        System.out.print("Product ID: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        System.out.print("New Price: ");
+        BigDecimal price = new BigDecimal(scanner.nextLine());
 
-            catalogService.changePrice(id, price);
-            System.out.println("✅ Price updated!");
-        } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-        }
+        catalogService.changePrice(id, price);
+        System.out.println("✅ Price updated!");
     }
 
     private void updateStock(Scanner scanner) {
-        try {
-            System.out.print("Product ID: ");
-            Long id = Long.parseLong(scanner.nextLine());
-            System.out.print("Add to Stock: ");
-            int qty = Integer.parseInt(scanner.nextLine());
+        System.out.print("Product ID: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        System.out.print("Add to Stock: ");
+        int qty = Integer.parseInt(scanner.nextLine());
 
-            catalogService.addStock(id, qty);
-            System.out.println("✅ Stock updated!");
-        } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
+        catalogService.addStock(id, qty);
+        System.out.println("✅ Stock updated!");
+    }
+
+    // 🔥 НОВЫЙ МЕТОД: Удаление
+    private void deleteProduct(Scanner scanner) {
+        System.out.print("Enter Product ID to DELETE: ");
+        Long id = Long.parseLong(scanner.nextLine());
+
+        System.out.print("⚠️ Are you sure? (type 'yes' to confirm): ");
+        String confirm = scanner.nextLine();
+
+        if ("yes".equalsIgnoreCase(confirm)) {
+            catalogService.deleteProduct(id);
+            System.out.println("🗑️ Product deleted successfully!");
+        } else {
+            System.out.println("Operation cancelled.");
         }
     }
 }
