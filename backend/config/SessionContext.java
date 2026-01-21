@@ -2,7 +2,7 @@ package backend.config;
 
 import backend.entity.User;
 
-public class SessionContext {
+public class  SessionContext {
     private static final SessionContext INSTANCE = new SessionContext();
     private User currentUser;
 

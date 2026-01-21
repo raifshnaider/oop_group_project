@@ -9,8 +9,7 @@ public class Order {
     private Long userId;
     private BigDecimal totalAmount;
     private OrderStatus status;
-    private String address;   // ✅ ОБЯЗАТЕЛЬНО
-
+    private String address;
     public Order() {}
 
     // getters
