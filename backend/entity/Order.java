@@ -2,23 +2,28 @@ package backend.entity;
 
 import backend.enums.OrderStatus;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public class Order {
+
     private Long id;
     private Long userId;
     private BigDecimal totalAmount;
     private OrderStatus status;
-    private LocalDateTime createdAt;
+    private String address;   // ✅ ОБЯЗАТЕЛЬНО
 
+    public Order() {}
+
+    // getters
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
     public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
     public BigDecimal getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
     public OrderStatus getStatus() { return status; }
+    public String getAddress() { return address; } // ✅
+
+    // setters
+    public void setId(Long id) { this.id = id; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
     public void setStatus(OrderStatus status) { this.status = status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setAddress(String address) { this.address = address; } // ✅
 }

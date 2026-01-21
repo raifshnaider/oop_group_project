@@ -8,24 +8,36 @@ import java.sql.*;
 
 public class OrderRepository {
     public Long save(Order order) {
-        String sql = "INSERT INTO orders (user_id, total_amount, status) VALUES (?, ?, ?) RETURNING id";
+        String sql = """
+        INSERT INTO orders (user_id, total_amount, status, address)
+        VALUES (?, ?, ?::order_status, ?)
+        RETURNING id
+    """;
+
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setLong(1, order.getUserId());
             stmt.setBigDecimal(2, order.getTotalAmount());
-            stmt.setString(3, order.getStatus().name());
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) return rs.getLong(1);
-        } catch (SQLException e) { e.printStackTrace(); }
+            stmt.setString(3, order.getStatus().name()); // "CREATED"
+            stmt.setString(4, order.getAddress());       // НЕ NULL
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getLong("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
+
 
     public FullOrderDTO getFullOrderDescription(Long orderId) {
         FullOrderDTO dto = null;
         String sql = """
             SELECT o.id, o.total_amount, o.status, u.email,
                    p.name as prod_name, c.name as cat_name, 
-                   oi.quantity, oi.price_at_purchase
+                   oi.quantity, oi.unit_price, oi.line_total
             FROM orders o
             JOIN users u ON o.user_id = u.id
             JOIN order_items oi ON o.id = oi.order_id
@@ -47,7 +59,7 @@ public class OrderRepository {
                 }
                 dto.items.add(new FullOrderDTO.OrderItemInfo(
                         rs.getString("prod_name"), rs.getString("cat_name"),
-                        rs.getInt("quantity"), rs.getBigDecimal("price_at_purchase")
+                        rs.getInt("quantity"), rs.getBigDecimal("unit_price")
                 ));
             }
         } catch (SQLException e) { e.printStackTrace(); }

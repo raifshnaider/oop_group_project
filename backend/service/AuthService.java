@@ -13,7 +13,7 @@ public class AuthService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             // В реальном проекте тут проверка хеша
-            if (user.getPassword().equals(password)) {
+            if (user.getPasswordHash().equals(password)) {
                 SessionContext.getInstance().setCurrentUser(user);
                 return true;
             }

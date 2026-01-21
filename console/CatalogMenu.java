@@ -4,6 +4,7 @@ import backend.entity.Product;
 import backend.service.CatalogService;
 import backend.service.OrderService;
 import backend.dto.FullOrderDTO;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class CatalogMenu {
         List<Product> products = catalogService.getAllProducts();
         System.out.println("\n--- CATALOG ---");
         for (Product p : products) {
-            System.out.println(p); // Использует toString() из Product
+            System.out.println(p);
         }
 
         System.out.println("\nEnter Product ID to buy (or 0 to back):");
@@ -29,11 +30,13 @@ public class CatalogMenu {
             System.out.println("Enter quantity:");
             int qty = Integer.parseInt(scanner.nextLine());
 
-            // Оформляем заказ
+            System.out.println("Enter delivery address:");
+            String address = scanner.nextLine().trim();
+
             Map<Long, Integer> cart = new HashMap<>();
             cart.put(prodId, qty);
 
-            FullOrderDTO result = orderService.placeOrder(cart);
+            FullOrderDTO result = orderService.placeOrder(cart, address);
             System.out.println("Order created successfully!");
             System.out.println(result);
 
