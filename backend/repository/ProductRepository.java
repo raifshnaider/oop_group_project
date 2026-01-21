@@ -69,6 +69,26 @@ public class ProductRepository {
         }
     }
 
+    public boolean isUsedInOrders(Long productId) {
+        String sql = "SELECT 1 FROM order_items WHERE product_id = ? LIMIT 1";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, productId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // true если найден хотя бы один order_item
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+
     public void save(Product product) {
         String sql = "INSERT INTO products (name, price, stock_qty, category_id) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -96,14 +116,26 @@ public class ProductRepository {
     }
 
     // 🔥 НОВЫЙ МЕТОД: УДАЛЕНИЕ
-    public void delete(Long id) {
+    public boolean delete(Long id) {
+
+        // 🔒 ПРОВЕРКА ПЕРЕД УДАЛЕНИЕМ
+        if (isUsedInOrders(id)) {
+            return false; // нельзя удалять
+        }
+
         String sql = "DELETE FROM products WHERE id = ?";
+
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setLong(1, id);
             stmt.executeUpdate();
+            return true;
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
+
 }
