@@ -3,6 +3,7 @@ package backend.repository;
 import backend.config.DatabaseConfig;
 import backend.entity.Product;
 
+import java.math.BigDecimal; // <-- Не забудь этот импорт!
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class ProductRepository {
                 p.setId(rs.getLong("id"));
                 p.setName(rs.getString("name"));
                 p.setPrice(rs.getBigDecimal("price"));
-                p.setStock(rs.getInt("stock_qty"));          // ✅ stock_qty
+                p.setStock(rs.getInt("stock_qty"));
                 p.setCategoryId(rs.getLong("category_id"));
                 list.add(p);
             }
@@ -45,7 +46,7 @@ public class ProductRepository {
                     p.setId(rs.getLong("id"));
                     p.setName(rs.getString("name"));
                     p.setPrice(rs.getBigDecimal("price"));
-                    p.setStock(rs.getInt("stock_qty"));      // ✅ было "stock"
+                    p.setStock(rs.getInt("stock_qty"));
                     p.setCategoryId(rs.getLong("category_id"));
                     return Optional.of(p);
                 }
@@ -57,7 +58,7 @@ public class ProductRepository {
     }
 
     public void updateStock(Long id, int newStock) {
-        String sql = "UPDATE products SET stock_qty = ? WHERE id = ?"; // ✅ было stock
+        String sql = "UPDATE products SET stock_qty = ? WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -68,5 +69,36 @@ public class ProductRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    // --- НОВЫЕ МЕТОДЫ ДЛЯ МЕНЕДЖЕРА ---
+
+    // 1. Создать товар
+    public void save(Product product) {
+        // Учти, что колонка называется stock_qty!
+        String sql = "INSERT INTO products (name, price, stock_qty, category_id) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, product.getName());
+            stmt.setBigDecimal(2, product.getPrice());
+            stmt.setInt(3, product.getStock());
+            stmt.setLong(4, product.getCategoryId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 2. Обновить цену
+    public void updatePrice(Long id, BigDecimal newPrice) {
+        String sql = "UPDATE products SET price = ? WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBigDecimal(1, newPrice);
+            stmt.setLong(2, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 }

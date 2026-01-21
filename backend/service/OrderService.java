@@ -8,6 +8,7 @@ import backend.enums.OrderStatus;
 import backend.repository.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 public class OrderService {
@@ -15,7 +16,7 @@ public class OrderService {
     private final OrderRepository orderRepository = new OrderRepository();
     private final OrderItemRepository orderItemRepository = new OrderItemRepository();
 
-
+    // --- Оформление заказа ---
     public FullOrderDTO placeOrder(Map<Long, Integer> cart, String address) {
         if (address == null || address.trim().length() < 5) {
             throw new IllegalArgumentException("Address is required (min 5 chars)");
@@ -24,7 +25,6 @@ public class OrderService {
         Long userId = SessionContext.getInstance().getCurrentUser().getId();
         BigDecimal total = BigDecimal.ZERO;
 
-
         for (Map.Entry<Long, Integer> entry : cart.entrySet()) {
             Product p = productRepository.findById(entry.getKey()).orElseThrow();
             if (p.getStock() < entry.getValue()) {
@@ -32,7 +32,6 @@ public class OrderService {
             }
             total = total.add(p.getPrice().multiply(BigDecimal.valueOf(entry.getValue())));
         }
-
 
         Order order = new Order();
         order.setUserId(userId);
@@ -45,7 +44,6 @@ public class OrderService {
             throw new RuntimeException("Order was not saved (orderId is null)");
         }
 
-
         for (Map.Entry<Long, Integer> entry : cart.entrySet()) {
             Product p = productRepository.findById(entry.getKey()).orElseThrow();
             orderItemRepository.saveRaw(orderId, p.getId(), entry.getValue(), p.getPrice());
@@ -55,8 +53,12 @@ public class OrderService {
         return orderRepository.getFullOrderDescription(orderId);
     }
 
-    
     public FullOrderDTO placeOrder(Map<Long, Integer> cart) {
         return placeOrder(cart, "Test address");
+    }
+
+    // --- НОВЫЙ МЕТОД: ИСТОРИЯ ЗАКАЗОВ ---
+    public List<FullOrderDTO> getOrdersByUser(Long userId) {
+        return orderRepository.findOrdersByUser(userId);
     }
 }

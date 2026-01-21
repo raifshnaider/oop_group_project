@@ -21,6 +21,8 @@ public class CatalogMenu {
 
     public void show(Scanner scanner) {
         while (true) {
+            clearScreen(); // <--- 🔥 ТУТ ОЧИЩАЕТСЯ ЭКРАН
+
             System.out.println("\n--- CATALOG ---");
             List<Product> products = catalogService.getAllProducts();
             for (Product p : products) {
@@ -40,9 +42,9 @@ public class CatalogMenu {
             if ("0".equals(input)) {
                 return; // Выход назад
             } else if ("c".equals(input)) {
-                showCart();
+                showCart(scanner); // 🔥 Добавил scanner, чтобы сделать паузу при просмотре
             } else if ("p".equals(input)) {
-                checkout();
+                checkout(scanner); // 🔥 Добавил scanner, чтобы сделать паузу после чека
             } else {
                 addToCart(input, scanner);
             }
@@ -56,6 +58,7 @@ public class CatalogMenu {
 
             if (productOpt.isEmpty()) {
                 System.out.println("❌ Product not found!");
+                pressEnterToContinue(scanner); // 🔥 Пауза
                 return;
             }
 
@@ -65,21 +68,25 @@ public class CatalogMenu {
 
             if (qty <= 0) {
                 System.out.println("❌ Quantity must be positive.");
+                pressEnterToContinue(scanner);
                 return;
             }
 
             // Добавляем или обновляем количество
             cart.merge(prodId, qty, Integer::sum);
             System.out.println("✅ Added to cart!");
+            // pressEnterToContinue(scanner); // Здесь можно не делать паузу, чтобы быстро добавлять
 
         } catch (NumberFormatException e) {
             System.out.println("❌ Invalid command.");
+            pressEnterToContinue(scanner); // 🔥 Пауза при ошибке
         }
     }
 
-    private void showCart() {
+    private void showCart(Scanner scanner) {
         if (cart.isEmpty()) {
             System.out.println("\n🛒 Cart is empty.");
+            pressEnterToContinue(scanner);
             return;
         }
 
@@ -101,16 +108,18 @@ public class CatalogMenu {
         }
         System.out.println("---------------------");
         System.out.printf("Total: $%.2f\n", estimatedTotal);
+
+        pressEnterToContinue(scanner); // 🔥 Пауза, чтобы успеть прочитать
     }
 
     private int getCartSize() {
         return cart.values().stream().mapToInt(Integer::intValue).sum();
     }
 
-    // --- ВОТ ЭТОТ МЕТОД ОБНОВЛЕН ---
-    private void checkout() {
+    private void checkout(Scanner scanner) {
         if (cart.isEmpty()) {
             System.out.println("⚠️ Cart is empty! Add items first.");
+            pressEnterToContinue(scanner);
             return;
         }
 
@@ -144,5 +153,19 @@ public class CatalogMenu {
         } catch (Exception e) {
             System.out.println("❌ Transaction Failed: " + e.getMessage());
         }
+
+        pressEnterToContinue(scanner); // 🔥 Пауза, чтобы успеть прочитать чек!
+    }
+
+    // --- Вспомогательные методы ---
+
+    private void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    private void pressEnterToContinue(Scanner scanner) {
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 }
