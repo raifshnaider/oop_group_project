@@ -26,6 +26,7 @@ public class AuthMenu {
     private void login(Scanner scanner) {
         System.out.print("Email: ");
         String email = scanner.nextLine();
+
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
@@ -38,8 +39,9 @@ public class AuthMenu {
 
     private void register(Scanner scanner) {
         System.out.println("\n--- REGISTRATION ---");
-        System.out.print("Enter Username: ");
-        String username = scanner.nextLine();
+
+        System.out.print("Enter Full Name: ");
+        String fullName = scanner.nextLine();   // ✅ ОБЪЯВЛЕНО
 
         System.out.print("Enter Email: ");
         String email = scanner.nextLine();
@@ -47,7 +49,7 @@ public class AuthMenu {
         System.out.print("Enter Password: ");
         String password = scanner.nextLine();
 
-        String result = authService.register(username, email, password);
+        String result = authService.register(email, password, fullName, "");
         System.out.println(result);
     }
 }
