@@ -8,6 +8,8 @@ import java.sql.Connection;
 public class App {
     public static void main(String[] args) {
         System.out.println("Запуск приложения...");
+        System.out.println(backend.util.PasswordHasher.hash("test123"));
+
 
         // Проверяем подключение к БД перед запуском меню
         try (Connection conn = DatabaseConfig.getConnection()) {

@@ -3,6 +3,7 @@ package console;
 import backend.entity.User;
 import backend.service.AuthService;
 import java.util.List;
+import backend.enums.Role;
 import java.util.Scanner;
 
 public class AdminMenu {
@@ -43,14 +44,24 @@ public class AdminMenu {
         System.out.print("\nEnter User ID: ");
         try {
             Long id = Long.parseLong(scanner.nextLine());
-            System.out.print("Enter New Role (ADMIN / MANAGER / CUSTOMER): ");
-            String role = scanner.nextLine();
 
-            authService.changeUserRole(id, role);
+            System.out.print("Enter New Role (ADMIN / MANAGER / CUSTOMER): ");
+            String roleInput = scanner.nextLine().trim().toUpperCase();
+
+            Role newRole;
+            try {
+                newRole = Role.valueOf(roleInput);
+            } catch (IllegalArgumentException e) {
+                System.out.println("❌ Invalid role. Use: ADMIN, MANAGER, CUSTOMER");
+                return;
+            }
+
+            authService.changeUserRole(id, newRole); // ✅ ТЕПЕРЬ Role
             System.out.println("✅ Role updated successfully!");
 
-        } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Invalid user ID format");
         }
     }
+
 }

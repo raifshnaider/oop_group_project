@@ -14,24 +14,24 @@ public class AuthService {
     private final UserRepository userRepository = new UserRepository();
 
     public boolean login(String email, String password) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
+        email = email.trim().toLowerCase();
+        password = password.trim();
 
-        if (userOpt.isEmpty()) {
-            return false;
-        }
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) return false;
 
         User user = userOpt.get();
-
-        if (!PasswordHasher.check(password, user.getPasswordHash())) {
-            return false;
-        }
+        if (!PasswordHasher.check(password, user.getPasswordHash())) return false;
 
         SessionContext.getInstance().setCurrentUser(user);
         return true;
     }
 
     public String register(String email, String password, String fullName, String phone) {
-        if (email == null || email.isBlank() || !email.contains("@") || email.startsWith("@")) {
+        email = email.trim().toLowerCase();
+        password = password.trim();
+
+        if (email.isBlank() || !email.contains("@") || email.startsWith("@")) {
             return "Error: Invalid email format (must contain @).";
         }
         if (userRepository.findByEmail(email).isPresent()) {
@@ -47,25 +47,15 @@ public class AuthService {
         user.setActive(true);
 
         userRepository.save(user);
-
         return "Registration successful! Please login.";
     }
 
-    // 🔥 --- МЕТОДЫ ДЛЯ АДМИНКИ ---
-
-    // 1. Получить список всех пользователей
+    // ✅ ДОБАВИТЬ ВОТ ЭТО:
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // 2. Сменить роль пользователю
-    public void changeUserRole(Long userId, String roleName) {
-        try {
-            // Приводим к верхнему регистру (admin -> ADMIN)
-            Role role = Role.valueOf(roleName.toUpperCase());
-            userRepository.updateRole(userId, role);
-        } catch (IllegalArgumentException e) {
-            System.out.println("❌ Ошибка: Такой роли нет! (Используйте: ADMIN, MANAGER, CUSTOMER)");
-        }
+    public void changeUserRole(long userId, Role newRole) {
+        userRepository.updateRole(userId, newRole);
     }
 }
