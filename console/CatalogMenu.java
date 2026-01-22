@@ -16,7 +16,6 @@ public class CatalogMenu {
     private final CatalogService catalogService = new CatalogService();
     private final OrderService orderService = new OrderService();
 
-    // Храним корзину в памяти: ID товара -> Количество
     private final Map<Long, Integer> cart = new HashMap<>();
 
     public void show(Scanner scanner) {

@@ -49,8 +49,6 @@ public class AuthService {
         userRepository.save(user);
         return "Registration successful! Please login.";
     }
-
-    // ✅ ДОБАВИТЬ ВОТ ЭТО:
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }

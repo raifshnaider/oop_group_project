@@ -8,20 +8,12 @@ import java.util.Optional;
 
 public class CatalogService {
     private final ProductRepository productRepository = new ProductRepository();
-
-    // --- КЛИЕНТСКИЕ МЕТОДЫ ---
-
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
-
     public Optional<Product> findById(Long id) {
         return productRepository.findById(id);
     }
-
-    // --- МЕТОДЫ ДЛЯ МЕНЕДЖЕРА ---
-
-    // 1. Создание товара (с валидацией)
     public void addNewProduct(String name, BigDecimal price, int stock, Long categoryId) {
         if (price.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Price must be positive!");
@@ -36,8 +28,6 @@ public class CatalogService {
         Product p = new Product(name, price, stock, categoryId);
         productRepository.save(p);
     }
-
-    // 2. Обновление цены (с валидацией)
     public void changePrice(Long productId, BigDecimal newPrice) {
         if (newPrice.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Price must be positive!");
@@ -45,7 +35,6 @@ public class CatalogService {
         productRepository.updatePrice(productId, newPrice);
     }
 
-    // 3. Обновление склада (с проверкой)
     public void addStock(Long productId, int quantityToAdd) {
         if (quantityToAdd <= 0) {
             throw new IllegalArgumentException("Quantity must be positive!");
@@ -58,8 +47,6 @@ public class CatalogService {
             throw new IllegalArgumentException("Product not found!");
         });
     }
-
-    // 4. 🔥 НОВЫЙ МЕТОД: Удаление товара
     public void deleteProduct(Long productId) {
         if (productRepository.findById(productId).isEmpty()) {
             throw new IllegalArgumentException("Product with ID " + productId + " not found!");

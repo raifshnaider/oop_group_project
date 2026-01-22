@@ -34,7 +34,6 @@ public class ManagerMenu {
                     default -> System.out.println("Invalid option");
                 }
             } catch (Exception e) {
-                // Здесь мы ловим ошибки из CatalogService (цена < 0, ID не найден и т.д.)
                 System.out.println("❌ ERROR: " + e.getMessage());
             }
         }

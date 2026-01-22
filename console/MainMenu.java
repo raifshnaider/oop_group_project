@@ -9,7 +9,7 @@ public class MainMenu {
     private final CatalogMenu catalogMenu = new CatalogMenu();
     private final OrderMenu orderMenu = new OrderMenu();
     private final AdminMenu adminMenu = new AdminMenu();
-    private final ManagerMenu managerMenu = new ManagerMenu(); // 🔥 ДОБАВЛЕНО!
+    private final ManagerMenu managerMenu = new ManagerMenu();
 
     public void start() {
         Scanner scanner = new Scanner(System.in);
@@ -23,7 +23,6 @@ public class MainMenu {
                 System.out.println("1. Catalog");
                 System.out.println("2. My Orders");
 
-                // 🔥 НОВАЯ ЛОГИКА:
                 if (role == Role.ADMIN) {
                     System.out.println("3. 👮 Admin Panel");
                 } else if (role == Role.MANAGER) {

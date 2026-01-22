@@ -12,14 +12,12 @@ public class Order {
     private String address;
     public Order() {}
 
-    // getters
     public Long getId() { return id; }
     public Long getUserId() { return userId; }
     public BigDecimal getTotalAmount() { return totalAmount; }
     public OrderStatus getStatus() { return status; }
     public String getAddress() { return address; } // ✅
 
-    // setters
     public void setId(Long id) { this.id = id; }
     public void setUserId(Long userId) { this.userId = userId; }
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }

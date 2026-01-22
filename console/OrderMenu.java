@@ -9,10 +9,8 @@ public class OrderMenu {
     private final OrderService orderService = new OrderService();
 
     public void showMyOrders() {
-        // Получаем ID текущего юзера
         Long userId = SessionContext.getInstance().getCurrentUser().getId();
 
-        // Запрашиваем историю заказов через сервис
         List<FullOrderDTO> orders = orderService.getOrdersByUser(userId);
 
         if (orders.isEmpty()) {

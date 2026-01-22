@@ -16,7 +16,6 @@ public class OrderService {
     private final OrderRepository orderRepository = new OrderRepository();
     private final OrderItemRepository orderItemRepository = new OrderItemRepository();
 
-    // --- Оформление заказа ---
     public FullOrderDTO placeOrder(Map<Long, Integer> cart, String address) {
         if (address == null || address.trim().length() < 5) {
             throw new IllegalArgumentException("Address is required (min 5 chars)");
@@ -57,7 +56,6 @@ public class OrderService {
         return placeOrder(cart, "Test address");
     }
 
-    // --- НОВЫЙ МЕТОД: ИСТОРИЯ ЗАКАЗОВ ---
     public List<FullOrderDTO> getOrdersByUser(Long userId) {
         return orderRepository.findOrdersByUser(userId);
     }
