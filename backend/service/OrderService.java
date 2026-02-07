@@ -6,6 +6,8 @@ import backend.entity.Order;
 import backend.entity.Product;
 import backend.enums.OrderStatus;
 import backend.repository.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -53,10 +55,18 @@ public class OrderService {
     }
 
     public FullOrderDTO placeOrder(Map<Long, Integer> cart) {
-        return placeOrder(cart, "Test address");
+        Supplier<FullOrderDTO> supplier =
+                () -> placeOrder(cart, "Test address");
+        return supplier.get();
     }
 
+
     public List<FullOrderDTO> getOrdersByUser(Long userId) {
-        return orderRepository.findOrdersByUser(userId);
+        Function<Long, List<FullOrderDTO>> loader =
+                id -> orderRepository.findOrdersByUser(id);
+
+        return loader.apply(userId);
     }
+
+
 }
